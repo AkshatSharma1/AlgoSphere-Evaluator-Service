@@ -6,12 +6,29 @@
 
 3. tsc --init
 
-4. Add script in package.json
-"scripts": {
-    "build": "npx tsc",
-    "watch": "tsc -w",
-    "prestart": "npm run build",
-    "start": "npx nodemon dist/index.js",
-    "dev": "npx concurrently \"npm run watch\" \"npo start\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+4. Add script in package.json:  Use this if you want first to convert to dist
+ "scripts": {
+
+    "lint": "eslint . --ext .ts",
+
+    "lint:fix": "eslint . --ext .ts --fix",
+
+    "format": "prettier --write \"**/*.ts\"",
+
+    "format:check": "prettier --check \"**/*.ts\"",
+
+    "prebuild": "npx eslint . --fix",
+
+    "build": "npx tsc",
+
+    "watch": "npx tsc -w",
+
+    "prestart": "npm run build",
+
+    "start": "npx nodemon dist/index.js",
+
+    "dev": "npx concurrently --kill-others \"npm run watch\" \"npm start\"",
+
+    "test": "echo \"Error: no test specified\" && exit 1"
+
+  },
