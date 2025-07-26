@@ -1,0 +1,39 @@
+{
+  "name": "algosphere-evaluator-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"**/*.ts\"",
+    "format:check": "prettier --check \"**/*.ts\"",
+    "prebuild": "npx eslint . --fix",
+    "build": "npx tsc",
+    "watch": "npx tsc -w",
+    "prestart": "npm run build",
+    "start": "npx nodemon dist/index.js",
+    "dev": "npx concurrently --kill-others \"npm run watch\" \"npm start\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.3.0",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.0",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0"
+  }
+}
