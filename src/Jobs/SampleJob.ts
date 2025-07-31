@@ -14,9 +14,9 @@ export default class SampleJob implements IJob{
     handle = (job?:Job) => {
         //handle the job
         console.log('Handler of job');
+        console.log(this.payload)
         if(job){
-            console.log(job.name, job.id, job.data);
-            
+            console.log(job.name, job.id, job.data); 
         }
     }
 
