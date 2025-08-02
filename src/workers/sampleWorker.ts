@@ -24,8 +24,7 @@ export default function sampleWorker(queueName: string){
         throw new Error(`Unknown job name: ${job.name}`)
     },{connection: redisConnection})
 
-    // console.log(worker);
-    worker();
+    console.log(worker);
     
 
     worker.on('completed', (job, returnValue) => {

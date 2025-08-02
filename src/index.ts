@@ -1,20 +1,30 @@
 import express, { Express } from 'express';
+import bodyParser from "body-parser"
 
 import serverConfig from './config/serverConfig';
 import apiRouter from './routes';
 import sampleQueueProducer from './producers/sampleQueueProducer';
 import sampleWorker from './workers/sampleWorker';
-sampleWorker("SampleJob");
+import serverAdapter from './config/bullBoardConfig';
 
 const app: Express = express();
 
+//Setup body parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.text())
+
+
 app.use('/api', apiRouter);
+app.use('/dashboard', serverAdapter.getRouter()); //bull board route
 
 app.listen(serverConfig.PORT, () => {
   console.log(`Server started at PORT ${serverConfig.PORT}`);
+  console.log(`Bullboard is live at: http://localhost:${serverConfig.PORT}/dashboard`)
 
   //Initialize a worker listening for job with SampleJob name. It will listen everytime
-  
+  sampleWorker("SampleQueue");
+
   //Firing up a producer
   sampleQueueProducer("SampleJob",{
     name:"Akshat",
