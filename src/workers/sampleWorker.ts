@@ -11,7 +11,7 @@ export default function sampleWorker(queueName: string){
     const worker = new Worker<IJob, WorkerResponse>(queueName, async(job:Job):Promise<WorkerResponse>=>{
         
         //do some work
-        console.log("Worker is running", job);
+        // console.log("Worker is running", job);
 
         //check for jobs
         if(job.name === "SampleJob"){
@@ -24,7 +24,7 @@ export default function sampleWorker(queueName: string){
         throw new Error(`Unknown job name: ${job.name}`)
     },{connection: redisConnection})
 
-    console.log(worker);
+    // console.log(worker);
     
 
     worker.on('completed', (job, returnValue) => {

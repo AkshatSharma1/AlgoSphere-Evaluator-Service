@@ -3,9 +3,10 @@ import bodyParser from "body-parser"
 
 import serverConfig from './config/serverConfig';
 import apiRouter from './routes';
-import sampleQueueProducer from './producers/sampleQueueProducer';
+// import sampleQueueProducer from './producers/sampleQueueProducer';
 import sampleWorker from './workers/sampleWorker';
 import serverAdapter from './config/bullBoardConfig';
+import runPython from './containers/runPythonDocker';
 
 const app: Express = express();
 
@@ -25,10 +26,14 @@ app.listen(serverConfig.PORT, () => {
   //Initialize a worker listening for job with SampleJob name. It will listen everytime
   sampleWorker("SampleQueue");
 
+  //Run the container: for example purpose only here
+  const code = "prin('hello world')";
+  runPython(code);
+
   //Firing up a producer
-  sampleQueueProducer("SampleJob",{
-    name:"Akshat",
-    goal: "Peaceful life"
-  })
+  // sampleQueueProducer("SampleJob",{
+  //   name:"Akshat",
+  //   goal: "Peaceful life"
+  // })
 
 });
