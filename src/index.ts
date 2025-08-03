@@ -27,8 +27,14 @@ app.listen(serverConfig.PORT, () => {
   sampleWorker("SampleQueue");
 
   //Run the container: for example purpose only here
-  const code = "prin('hello world')";
-  runPython(code);
+  const code = `x = input()
+  y = input()
+  print("value of x is", x)
+  print("value of y is", y)`;
+
+  const testCases = `100
+  200`
+  runPython(code, testCases);
 
   //Firing up a producer
   // sampleQueueProducer("SampleJob",{
