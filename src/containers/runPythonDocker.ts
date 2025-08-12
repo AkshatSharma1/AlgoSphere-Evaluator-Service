@@ -1,30 +1,37 @@
+// src/containers/runPythonDocker.ts
+
 import createContainer from "./containerFactory";
 import { PYTHON_IMAGE } from "../utils/constants";
 import decodeDockerStream from "./dockerHelper";
 import DockerStreamOutput from "../types/dockerStreamOutput";
+import dockerResourcesConfig from "../config/dockerResourcesConfig";
+import TimeLimitExceededError from "../errors/TimeLimitExceededError";
 
-export default async function runPython(code: string, inputTestCase: string) {
-
+export default async function runPython(code: string, inputTestCase: string, outputTestCase: string): Promise<DockerStreamOutput> {
     const rawLogBuffer: Buffer[] = [];
+    console.log("Initializing the python container");
+    console.log(outputTestCase);
     
-    console.log("Initializing the container");
 
-    const processedCode = code.split('\n')      // 1. Split by newlines
-                              .map(line => line.trim()) // 2. Remove whitespace
-                              .join('; '); //add ;
-    
-    //old command
-    // const pythonContainer = await createContainer(PYTHON_IMAGE, ['python3','-c',code,'stty -echo']);
+    // Host config file for preventing fork bomb
+    const hostConfig = {
+        Memory: dockerResourcesConfig.docker.memoryLimit,
+        CpuShares: dockerResourcesConfig.docker.cpuShares,
+        PidsLimit: dockerResourcesConfig.docker.pidsLimit
+    };
 
-    // 1. Define the complete shell command as a single string.
-    const command = `echo '${processedCode.replace(/'/g, `'\\"`)}' > test.py && echo '${inputTestCase.replace(/'/g, `'\\"`)}' | python3 test.py`; 
+    // Escape single quotes in the code and input to prevent shell injection
+    const processedCode = code.replace(/'/g, "'\\''");
+    const processedInput = inputTestCase.replace(/'/g, "'\\''");
 
-    // 2. Pass a proper array with three separate string elements to the container.
+    // Command to write code to a file and then execute it with input piped from echo
+    const command = `echo '${processedCode}' > test.py && echo '${processedInput}' | python3 test.py`;
+
     const pythonContainer = await createContainer(PYTHON_IMAGE, [
-        '/bin/sh', 
-        '-c', 
+        '/bin/sh',
+        '-c',
         command
-    ]);
+    ], hostConfig);
 
     await pythonContainer.start();
     console.log("Python container started");
@@ -39,15 +46,27 @@ export default async function runPython(code: string, inputTestCase: string) {
         rawLogBuffer.push(chunk);
     });
 
-    //to remove container from docker from done
-    await new Promise((resolve, _reject)=>{
+    // Timeout execution to prevent infinite loop
+    const executionPromise: Promise<DockerStreamOutput> = new Promise((res, rej) => {
+        const timeout = setTimeout(async () => {
+            console.log("Execution timed out. Stopping container.");
+            await pythonContainer.stop();
+            rej(new TimeLimitExceededError());
+        }, 10000);
+
         loggerStream.on('end', () => {
-            console.log(rawLogBuffer);
+            clearTimeout(timeout);
             const logs: DockerStreamOutput = decodeDockerStream(rawLogBuffer);
             console.log(logs);
-            resolve(decodeDockerStream)
+            res(logs);
         });
-    })
+    });
 
-    await pythonContainer.remove();
+    try {
+        const result: DockerStreamOutput = await executionPromise;
+        return result;
+    } finally {
+        await pythonContainer.remove();
+        console.log("Container removed");
+    }
 }

@@ -1,19 +1,26 @@
 import { Request, Response } from "express";
 import { CreateSubmissionDto } from "../dtos/CreateSubmissionDto";
 
-export const addSubmission = (req: Request, res: Response)=>{
+export const addSubmission = async (req: Request, res: Response) => {
+    const submissionDto: CreateSubmissionDto = req.body;
+    console.log("hello",submissionDto)
 
-    //validate req body
-    const submissionDto = req.body as CreateSubmissionDto;
+    // The test cases are hardcoded for now, as requested.
+    // const submissionPayload: SubmissionPayload = {
+    //     code: submissionDto.code,
+    //     language: submissionDto.language,
+    //     inputCase: "10\n20", 
+    // };
 
-    //Do validation
-    console.log("Sent the submission data");
-    
+    // const payload = {
+    //     [submissionDto.problemId]: submissionPayload
+    // };
 
     return res.status(201).json({
         success: true,
+        message: "Successfully collected the submission",
+        data: submissionDto,
         error: {},
-        message: "Successfully collected the submisssion",
-        data: submissionDto
-    })
-}
+    });
+
+};

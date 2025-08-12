@@ -9,7 +9,7 @@ import Docker from "dockerode";
  * @returns A promise that resolves to the created Docker container object.
  */
 
-export default async function createContainer(imageName: string, cmdExecutable: string[]): Promise<Docker.Container> {
+export default async function createContainer(imageName: string, cmdExecutable: string[], hostConfig?: Docker.ContainerCreateOptions['HostConfig']): Promise<Docker.Container> {
     const docker = new Docker();
 
     // This function attempts to pull the specified image from the Docker registry.
@@ -54,6 +54,7 @@ export default async function createContainer(imageName: string, cmdExecutable: 
         AttachStderr: true, // Enable error stream
         OpenStdin: true,    // Keep the input stream open
         Tty: false,         // Set to false to get separate stdout/stderr streams
+        HostConfig: hostConfig
     });
     console.log("Container created successfully.");
 
