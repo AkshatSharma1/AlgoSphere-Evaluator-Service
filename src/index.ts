@@ -9,6 +9,7 @@ import serverAdapter from './config/bullBoardConfig';
 // import runPython from './containers/runPythonDocker';
 import submissionWorker from './workers/submissionWorker';
 import { connectDB } from './config/db.config';
+import cors from 'cors';
 
 const app: Express = express();
 
@@ -16,6 +17,7 @@ const app: Express = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.text())
+app.use(cors())
 
 
 app.use('/api', apiRouter);
