@@ -24,6 +24,8 @@ if (!redisUrl) {
 
 // ioredis can parse the full connection URL directly. This is the standard
 // way to connect to hosted Redis instances like those on Upstash or Render.
-const redisConnection = new Redis(redisUrl);
+const redisConnection = new Redis(redisUrl, {
+    maxRetriesPerRequest: null
+});
 
 export default redisConnection;
